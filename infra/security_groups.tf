@@ -60,3 +60,12 @@ resource "aws_security_group_rule" "mysql_from_ecs" {
   security_group_id        = aws_security_group.db_mysql.id
   source_security_group_id = aws_security_group.ecs.id
 }
+
+resource "aws_security_group_rule" "ssh_to_db" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.db_mysql.id
+}
