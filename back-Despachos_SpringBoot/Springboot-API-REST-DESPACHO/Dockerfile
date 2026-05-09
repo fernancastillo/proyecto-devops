@@ -20,6 +20,6 @@ COPY entrypoint.sh /app/entrypoint.sh
 # MUY IMPORTANTE: Dar permisos de ejecución al script
 RUN chmod +x /app/entrypoint.sh
 
-EXPOSE 8080
+EXPOSE 8081
 # Ahora el ENTRYPOINT ejecuta el script, no el jar directamente
 ENTRYPOINT ["./entrypoint.sh"]
