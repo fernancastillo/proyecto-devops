@@ -26,22 +26,11 @@ resource "aws_ecs_task_definition" "app" {
       }
 
       environment = [
-        {
-            name  = "DB_HOST",
-            value = aws_instance.db.private_ip
-        },
-        {
-            name  = "SPRING_DATASOURCE_URL"
-            value = "jdbc:mysql://${aws_instance.db.private_ip}:3306/${var.db_ven}"
-        },
-        {
-            name  = "SPRING_DATASOURCE_USERNAME"
-            value = var.db_user
-        },
-        {
-            name  = "SPRING_DATASOURCE_PASSWORD"
-            value = var.db_password
-        }
+        { name = "DB_ENDPOINT", value = aws_instance.db.private_ip },  
+        { name = "DB_PORT",     value = "3306" },                      
+        { name = "DB_NAME",     value = var.db_ven },                  
+        { name = "DB_USERNAME", value = var.db_user },                  
+        { name = "DB_PASSWORD", value = var.db_password }               
       ]
       logConfiguration = {
         logDriver = "awslogs",
@@ -70,22 +59,11 @@ resource "aws_ecs_task_definition" "app" {
       }
 
       environment = [
-        {
-            name  = "DB_HOST",
-            value = aws_instance.db.private_ip
-        },
-        {
-            name  = "SPRING_DATASOURCE_URL"
-            value = "jdbc:mysql://${aws_instance.db.private_ip}:3306/${var.db_desp}"
-        },
-        {
-            name  = "SPRING_DATASOURCE_USERNAME"
-            value = var.db_user
-        },
-        {
-            name  = "SPRING_DATASOURCE_PASSWORD"
-            value = var.db_password
-        }
+        { name = "DB_ENDPOINT", value = aws_instance.db.private_ip },  
+        { name = "DB_PORT",     value = "3306" },                       
+        { name = "DB_NAME",     value = var.db_desp },                 
+        { name = "DB_USERNAME", value = var.db_user },                 
+        { name = "DB_PASSWORD", value = var.db_password }               
       ]
       logConfiguration = {
         logDriver = "awslogs",
