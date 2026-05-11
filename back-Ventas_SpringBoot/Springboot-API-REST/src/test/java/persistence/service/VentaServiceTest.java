@@ -11,11 +11,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
-
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class VentaServiceTest {
@@ -87,5 +86,81 @@ public class VentaServiceTest {
         assertNotNull(result);
         assertEquals(1L, result.getIdVenta());
         assertEquals(ventaToSave.getDireccionCompra(), result.getDireccionCompra());
+    }
+
+    @Test
+    @DisplayName("Cuando se buscan todas las ventas, entonces se retorna la lista completa")
+    public void whenFindAllVentas_thenReturnList() {
+        Venta venta2 = Venta.builder()
+                .idVenta(2L)
+                .direccionCompra("Av. Providencia 456")
+                .valorCompra(5000)
+                .fechaCompra(LocalDate.of(2025, 3, 10))
+                .despachoGenerado(false)
+                .build();
+
+        when(ventaRepository.findAll()).thenReturn(java.util.Arrays.asList(venta, venta2));
+
+        java.util.List<Venta> resultado = ventaService.findAllVentas();
+
+        assertEquals(2, resultado.size());
+        verify(ventaRepository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("Cuando se busca una venta por ID existente, entonces se retorna la venta")
+    public void whenFindById_withValidId_thenReturnVenta() throws com.citt.exceptions.VentaNotFoundException {
+        venta = Venta.builder()
+                .idVenta(1L)
+                .direccionCompra("Calle Falsa 123")
+                .valorCompra(1000)
+                .fechaCompra(LocalDate.of(2025, 4, 14))
+                .despachoGenerado(false)
+                .build();
+
+        when(ventaRepository.findById(1L)).thenReturn(java.util.Optional.of(venta));
+
+        Venta resultado = ventaService.findById(1L);
+
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.getIdVenta());
+        verify(ventaRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    @DisplayName("Cuando se busca una venta por ID inexistente, entonces lanza VentaNotFoundException")
+    public void whenFindById_withInvalidId_thenThrowException() {
+        when(ventaRepository.findById(99L)).thenReturn(java.util.Optional.empty());
+
+        assertThrows(com.citt.exceptions.VentaNotFoundException.class,
+                () -> ventaService.findById(99L));
+    }
+
+    @Test
+    @DisplayName("Cuando se elimina una venta existente, entonces se elimina correctamente")
+    public void whenDeleteVenta_withValidId_thenDeleteSuccessfully() throws com.citt.exceptions.VentaNotFoundException {
+        venta = Venta.builder()
+                .idVenta(1L)
+                .direccionCompra("Calle Falsa 123")
+                .valorCompra(1000)
+                .fechaCompra(LocalDate.of(2025, 4, 14))
+                .despachoGenerado(false)
+                .build();
+
+        when(ventaRepository.findById(1L)).thenReturn(java.util.Optional.of(venta));
+        doNothing().when(ventaRepository).deleteById(1L);
+
+        ventaService.deleteVenta(1L);
+
+        verify(ventaRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    @DisplayName("Cuando se elimina una venta inexistente, entonces lanza VentaNotFoundException")
+    public void whenDeleteVenta_withInvalidId_thenThrowException() {
+        when(ventaRepository.findById(99L)).thenReturn(java.util.Optional.empty());
+
+        assertThrows(com.citt.exceptions.VentaNotFoundException.class,
+                () -> ventaService.deleteVenta(99L));
     }
 }
