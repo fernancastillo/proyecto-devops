@@ -11,11 +11,10 @@ data "aws_ami" "amazon_linux" {
 resource "aws_instance" "db" {
   ami                    = data.aws_ami.amazon_linux.id
   instance_type          = "t3.micro"
-  subnet_id              = aws_subnet.public.id
+  subnet_id              = aws_subnet.private.id  
   vpc_security_group_ids = [aws_security_group.db_mysql.id]
   key_name               = var.key_pair_name
 
-  # 🔹 Aumenta disco (clave)
   root_block_device {
     volume_size = 20
     volume_type = "gp3"
@@ -26,14 +25,12 @@ resource "aws_instance" "db" {
     set -xe
     exec > /var/log/user-data.log 2>&1
 
-    # AL2023 requiere el repo oficial de Docker
     dnf update -y
     dnf install -y docker --allowerasing
 
     systemctl start docker
     systemctl enable docker
 
-    # Esperar que Docker esté listo
     sleep 5
     until docker info > /dev/null 2>&1; do
       echo "Esperando Docker..."
@@ -42,7 +39,6 @@ resource "aws_instance" "db" {
 
     docker system prune -af
 
-    # Levantar MySQL
     docker run -d \
       --name mysql \
       -e MYSQL_ROOT_PASSWORD="${var.db_password}" \
