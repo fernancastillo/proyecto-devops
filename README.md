@@ -241,14 +241,48 @@ git push origin develop
 ```
  
 ---
- 
+```
 ## Estructura del proyecto
-. ├── .github/ │ └── workflows/ │ ├── ci.yml # Pipeline de integración continua │ └── cd.yml # Pipeline de despliegue continuo ├── back-Ventas_SpringBoot/ │ └── Springboot-API-REST/ # Backend de ventas (puerto 8080) ├── back-Despachos_SpringBoot/ │ └── Springboot-API-REST-DESPACHO/ # Backend de despachos (puerto 8081) ├── front_despacho/ # Frontend React (puerto 80) ├── terraform/ # Infraestructura como código ├── docker-compose.yml # Configuración para ejecución local ├── init.sql # Inicialización de base de datos └── README.md
-
-
-
-
-
+proyecto-semestral/
+├── .github/
+│   └── workflows/
+│       ├── ci.yml                          # Pipeline de integración continua
+│       └── cd.yml                          # Pipeline de despliegue continuo
+│
+├── back-Ventas_SpringBoot/
+│   └── Springboot-API-REST/
+│       ├── src/main/resources/
+│       │   └── application.properties      # Configuración Spring Boot y BD
+│       ├── Dockerfile                      # Imagen Docker multi-stage (Maven + JDK)
+│       └── entrypoint.sh                   # Script de arranque del contenedor
+│
+├── back-Despachos_SpringBoot/
+│   └── Springboot-API-REST-DESPACHO/
+│       ├── src/main/resources/
+│       │   └── application.properties      # Configuración Spring Boot y BD
+│       ├── Dockerfile                      # Imagen Docker multi-stage (Maven + JDK)
+│       └── entrypoint.sh                   # Script de arranque del contenedor
+│
+├── front_despacho/
+│   ├── nginx.conf                          # Configuración Nginx + proxy backends
+│   └── Dockerfile                          # Imagen Docker multi-stage (Node + Nginx)
+│
+├── terraform/
+│   ├── main.tf                             # Provider AWS y región
+│   ├── vpc.tf                              # VPC, IGW, NAT Gateway, route tables
+│   ├── instances.tf                        # EC2 MySQL + CloudWatch Log Group
+│   ├── ecr.tf                              # Repositorios ECR
+│   ├── ecs.tf                              # ECS Cluster + IAM Role
+│   ├── service.tf                          # ECS Service Fargate
+│   ├── task_app.tf                         # ECS Task Definition (3 contenedores)
+│   ├── security_groups.tf                  # Security Groups ECS y MySQL
+│   ├── variables.tf                        # Variables del proyecto
+│   └── outputs.tf                          # URLs ECR e IP privada MySQL
+│
+├── docker-compose.yml                      # Ejecución local de todos los servicios
+├── .env                                    # Variables de entorno locales
+└── README.md
+```
  
 ---
  
@@ -287,4 +321,6 @@ Se eligió **named volume** sobre bind mount porque:
  
 ---
  
-© 2025 ITPCARGO — Duoc UC
+## Diagrama de arquitectura
+
+![Diagrama de arquitectura AWS](./assets/Diagrama%20de%20Arquitectura.png)
