@@ -1,0 +1,38 @@
+#Despliegue
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front_despacho
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front_despacho
+  template:
+    metadata:
+      labels:
+        app: front_despacho
+    spec:
+      containers:
+        - name: front_despacho
+          image: 339713057785.dkr.ecr.us-east-1.amazonaws.com/frontend-despacho:latest
+          #no descargar la imagen desde Docker Hub, sinó que local.
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+---
+#Service:
+apiVersion: v1
+kind: Service
+metadata:
+  name: front_despacho
+spec:
+  selector:
+    app: front_despacho
+  ports:
+    - port: 80
+      targetPort: 80
+      #Puerto expuesto en el nodo de kubernet:
+      nodePort: 30080
+  #NodePort: expone el servicio fuera de cluster kubernet:
+  type: LoadBalancer

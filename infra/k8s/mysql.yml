@@ -1,0 +1,52 @@
+#Despliegue
+#configuraciones de la imagen:
+
+#Nombre y versión de mi proyecto:
+apiVersion: apps/v1
+#Tipo de recurso:
+kind: Deployment
+
+metadata:
+  name: mysql
+
+#aquí comienzan las configuraciones:
+spec:
+  #Cantidad de pods que quiero mantener activos
+  replicas: 1
+
+  #aquí sabe para quién son las réplicas
+  selector:
+    matchLabels:
+      app: mysql
+
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+            - name: MYSQL_DATABASE
+              value: gamecatalog
+---
+#Servicio
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+
+#comienza la configuración:
+spec:
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+  #ClusterIP: solamente es accesible dentro del cluster kubernet
+  type: ClusterIP

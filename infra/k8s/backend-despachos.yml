@@ -1,0 +1,41 @@
+#Despliegue
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend_despachos
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend_despachos
+  template:
+    metadata:
+      labels:
+        app: backend_despachos
+    spec:
+      containers:
+        - name: backend_despachos
+          image: 339713057785.dkr.ecr.us-east-1.amazonaws.com/backend-despachos:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql:3306/gamecatalog
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: root
+---
+#Service:
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend_despachos
+spec:
+  selector:
+    app: backend_despachos
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: ClusterIP
