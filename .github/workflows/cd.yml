@@ -30,8 +30,8 @@ jobs:
 
       - name: Build y Push de las imágenes
         run: |
-          docker-compose build
-          docker-compose push
+          docker compose build
+          docker compose push
 
       - name: Configurar kubectl
         run: |
@@ -73,14 +73,15 @@ jobs:
           kubectl get svc
           echo ""
           echo "=== URL pública del frontend ==="
-          kubectl get svc frontend -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+          kubectl get svc frontend \
+            -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
 
       - name: Estado del autoscaling
         run: |
           echo "=== Estado del HPA ==="
           kubectl get hpa
 
-      - name: Evidencia de logs
+      - name: Evidencia de logs con kubectl
         run: |
           echo "=== Pods corriendo ==="
           kubectl get pods
@@ -91,9 +92,22 @@ jobs:
           echo "=== Logs backend-despachos ==="
           kubectl logs deployment/backend-despachos --tail=20
 
+      - name: Evidencia de logs con CloudWatch
+        run: |
+          echo "=== Consultando logs en CloudWatch ==="
+          aws logs describe-log-groups \
+            --log-group-name-prefix "/aws/eks" \
+            --region ${{env.AWS_REGION}}
+          echo ""
+          echo "=== Estado del cluster EKS ==="
+          aws eks describe-cluster \
+            --name ${{env.EKS_CLUSTER}} \
+            --region ${{env.AWS_REGION}} \
+            --query 'cluster.{status:status,version:version,endpoint:endpoint}'
+
       - name: Simulación de recuperación - eliminar un pod
         run: |
-          echo "=== Nodos antes de eliminar pod ==="
+          echo "=== Pods antes de eliminar ==="
           kubectl get pods
           echo ""
           echo "=== Eliminando un pod de backend-ventas ==="
