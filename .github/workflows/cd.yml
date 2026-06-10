@@ -48,7 +48,7 @@ jobs:
 
       - name: Aplicar manifiestos Kubernetes
         run: |
-          kubectl apply -f k8s/secret.yml
+          kubectl apply -f k8s/secrets.yml
           kubectl apply -f k8s/mysql.yml
           kubectl apply -f k8s/backend-ventas.yml
           kubectl apply -f k8s/backend-despachos.yml
