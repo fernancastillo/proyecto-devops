@@ -1,40 +1,58 @@
-#Despliegue
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend_ventas
+  name: backend-ventas
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: backend_ventas
+      app: backend-ventas
   template:
     metadata:
       labels:
-        app: backend_ventas
+        app: backend-ventas
     spec:
       containers:
-        - name: backend_ventas
-          image: 339713057785.dkr.ecr.us-east-1.amazonaws.com/backend-ventas:latest
+        - name: backend-ventas
+          image: 654654198246.dkr.ecr.us-east-1.amazonaws.com/entrega-devops-backend-ventas:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:
-            - name: SPRING_DATASOURCE_URL
-              value: jdbc:mysql://mysql:3306/gamecatalog
-            - name: SPRING_DATASOURCE_USERNAME
-              value: root
-            - name: SPRING_DATASOURCE_PASSWORD
-              value: root
+            - name: DB_ENDPOINT
+              value: "mysql"
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: db-name          
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: db-username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: db-root-password
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
 ---
-#Service:
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend_ventas
+  name: backend-ventas
 spec:
   selector:
-    app: backend_ventas
+    app: backend-ventas
   ports:
     - port: 8080
       targetPort: 8080
