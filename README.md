@@ -24,7 +24,7 @@ Sistema de gestión de despachos desarrollado con arquitectura de microservicios
 
 ## Arquitectura
 
-![Diagrama de arquitectura AWS](./assets/Diagrama%20de%20Arquitectura.png)
+![Diagrama de arquitectura AWS](./assets/Diagrama%20de%20Actualizado.drawio.png)
 
 ```
 Internet
