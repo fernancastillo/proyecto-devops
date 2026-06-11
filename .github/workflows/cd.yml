@@ -105,7 +105,7 @@ jobs:
             --region ${{env.AWS_REGION}} \
             --query 'cluster.{status:status,version:version,endpoint:endpoint}'
 
-      - name: Simulación de recuperación - eliminar un pod
+      - name: Simulación de recuperación
         run: |
           echo "=== Pods antes de eliminar ==="
           kubectl get pods
