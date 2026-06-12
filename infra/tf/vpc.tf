@@ -16,8 +16,8 @@ resource "aws_subnet" "public" {
 
   tags = {
     Name                                            = "devops_public_a"
-    "kubernetes.io/cluster/${var.eks_cluster_name}" = "shared"  # requerido por EKS
-    "kubernetes.io/role/elb"                        = "1"        # permite crear LoadBalancers
+    "kubernetes.io/cluster/${var.eks_cluster_name}" = "shared"  
+    "kubernetes.io/role/elb"                        = "1"       
   }
 }
 
