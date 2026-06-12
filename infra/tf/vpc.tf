@@ -1,6 +1,8 @@
 resource "aws_vpc" "devops_vpc" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
+  enable_dns_support   = true  # requerido por EKS
+
   tags = {
     Name = "devops_vpc"
   }
@@ -13,7 +15,9 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "devops_public_a"  
+    Name                                            = "devops_public_a"
+    "kubernetes.io/cluster/${var.eks_cluster_name}" = "shared"  
+    "kubernetes.io/role/elb"                        = "1"       
   }
 }
 
@@ -24,47 +28,20 @@ resource "aws_subnet" "public_b" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "devops_public_b"  
-  }
-}
-
-resource "aws_subnet" "private" {
-  vpc_id                  = aws_vpc.devops_vpc.id
-  cidr_block              = "10.0.3.0/24"
-  availability_zone       = "${var.aws_region}a"
-  map_public_ip_on_launch = false
-
-  tags = {
-    Name = "devops_private"
+    Name                                            = "devops_public_b"
+    "kubernetes.io/cluster/${var.eks_cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                        = "1"
   }
 }
 
 resource "aws_internet_gateway" "devops_ig" {
   vpc_id = aws_vpc.devops_vpc.id
+
   tags = {
     Name = "devops_igw"
   }
 }
 
-resource "aws_eip" "nat" {
-  domain = "vpc"
-  tags = {
-    Name = "devops_nat_eip"
-  }
-}
-
-resource "aws_nat_gateway" "devops_nat" {
-  allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public.id
-
-  tags = {
-    Name = "devops_nat"
-  }
-
-  depends_on = [aws_internet_gateway.devops_ig]
-}
-
-# Route table pública (sin cambios)
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.devops_vpc.id
 
@@ -82,22 +59,4 @@ resource "aws_route_table_association" "public" {
 resource "aws_route_table_association" "public_b" {
   subnet_id      = aws_subnet.public_b.id
   route_table_id = aws_route_table.public.id
-}
-
-resource "aws_route_table" "private" {
-  vpc_id = aws_vpc.devops_vpc.id
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.devops_nat.id
-  }
-
-  tags = {
-    Name = "devops_private_rt"
-  }
-}
-
-resource "aws_route_table_association" "private" {
-  subnet_id      = aws_subnet.private.id
-  route_table_id = aws_route_table.private.id
 }
